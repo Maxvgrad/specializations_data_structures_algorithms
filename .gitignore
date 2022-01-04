@@ -1,0 +1,11 @@
+.idea/*
+*.cpp
+*.hs
+*.java
+*.kt
+*.js
+*.rb
+*.pdf
+*.scala
+*.cs
+*.rs
