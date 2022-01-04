@@ -1,10 +1,19 @@
-def max_pairwise_product(numbers):
-    n = len(numbers) - 1
 
-    if n == 2:
+def max_pairwise_product_naive(numbers):
+    n = len(numbers)
+    product = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            product = max(product, numbers[i] * numbers[j])
+    return product
+
+
+def max_pairwise_product(numbers):
+    n = len(numbers)
+
+    if n == 3:
         max_a = numbers[0]
         max_i = 0
-
 
         for i in range(1, 3):
             if max_a < numbers[i]:
@@ -21,25 +30,16 @@ def max_pairwise_product(numbers):
 
         return max_a * numbers[max_j]
 
-
-
     max_a = max(numbers[0], numbers[1])
     max_b = min(numbers[0], numbers[1])
 
     for i in range(2, n):
         a = numbers[i]
-        b = numbers[i+1]
-        max_num = max(a, b)
-        if max_a < max_num:
-            max_a = max_num
-        elif max_b < max_num:
-            max_b = max_num
-            continue
-        else:
-            continue
-        max_num = min(a, b)
-        if max_b < max_num:
-            max_b = max_num
+        if max_a < a:
+            max_b = max_a
+            max_a = a
+        elif max_b < a:
+            max_b = a
 
     return max_b * max_a
 
