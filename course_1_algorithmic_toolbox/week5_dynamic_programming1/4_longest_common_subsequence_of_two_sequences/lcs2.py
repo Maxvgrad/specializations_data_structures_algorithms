@@ -91,8 +91,10 @@ def lcs2_naive(a, b):
             else:
                 pointer_a += 1
         else:
-            pointer_a += 1
-            pointer_b += 1
+            if elem_a_index_in_b < elem_b_index_in_a:
+                pointer_b += 1
+            else:
+                pointer_a += 1
 
     return sequence
 
@@ -121,9 +123,91 @@ def get_indexes_greater_than_pointer(pointer, indexes):
             return indexes[i:]
     return []
 
-def lcs2(a, b):
-    #write your code here
-    return min(len(a), len(b))
+
+def init_matrix(s, t):
+    rows, cols = (len(t) + 1, len(s) + 1)
+    matrix = [[0 for _ in range(0, cols)] for _ in range(0, rows)]
+
+    for i in range(0, rows):
+        for j in range(0, cols):
+
+            if i == 0 and j == 0:
+                matrix[i][j] = Node()
+                continue
+
+            if i == 0:
+                parent = matrix[i][j - 1]
+                matrix[i][j] = Node(None, parent.score + indel(None), parent)
+                continue
+
+            if j == 0:
+                parent = matrix[i - 1][j]
+                matrix[i][j] = Node(None, parent.score + indel(None), parent)
+                continue
+
+            col_elem = s[j - 1]
+            row_elem = t[i - 1]
+
+            if col_elem == row_elem:
+                parent = matrix[i - 1][j-1]
+                matrix[i][j] = Node(col_elem, parent.score + match(col_elem, row_elem), parent)
+                continue
+
+            score_insert_node_pair = get_pair(matrix[i - 1][j], lambda: indel(row_elem))
+            score_delete_node_pair = get_pair(matrix[i][j - 1], lambda: indel(col_elem))
+
+            pairs_arr = [score_insert_node_pair, score_delete_node_pair]
+
+            max_score = max([pair[0] for pair in pairs_arr])
+
+            optimal_parent_nodes = [pair[1] for pair in pairs_arr if max_score == pair[0]]
+
+            matrix[i][j] = Node(None, max_score, optimal_parent_nodes[0])
+
+    return matrix
+
+
+def lcs2(s, t):
+    return init_matrix(s, t)[len(t)][len(s)].score
+
+
+def get_min_score(pairs):
+    return min([pair[0] for pair in pairs])
+
+
+def get_pair(node, score_function):
+    if type(node) is int:
+        print('')
+    return (node.score + score_function(), node)
+
+
+def indel(a):
+    return 0
+
+
+def match(a, b):
+    if a == b:
+        return 1
+    else:
+        raise Exception('Unsupported')
+
+
+class Node:
+
+    def __init__(self, elem=None, score=0, root=None) -> None:
+        super().__init__()
+        self.elem = elem
+        self.score = score
+        self.root = root
+
+    def is_root(self):
+        return self.root is None
+
+    def is_match(self):
+        return self.elem is None
+
+    def __str__(self) -> str:
+        return 'Score: {}'.format(self.score)
 
 if __name__ == '__main__':
     input = sys.stdin.read()
@@ -138,4 +222,4 @@ if __name__ == '__main__':
     data = data[1:]
     b = data[:m]
 
-    print(lcs2_naive(a, b))
+    print(lcs2(a, b))
