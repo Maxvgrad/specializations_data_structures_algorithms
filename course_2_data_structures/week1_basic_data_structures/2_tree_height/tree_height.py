@@ -6,15 +6,29 @@ import threading
 
 def compute_height(n, parents):
     # Replace this code with a faster implementation
-    max_height = 0
-    for vertex in range(n):
-        height = 0
-        current = vertex
-        while current != -1:
-            height += 1
-            current = parents[current]
-        max_height = max(max_height, height)
-    return max_height
+    cache = {}
+
+    for i in range(0, len(parents)):
+        key = str(parents[i])
+        if key not in cache:
+            cache[key] = []
+        cache[key].append(str(i))
+
+    def get_height(node_label):
+        if node_label not in cache:
+            cache[node_label] = []
+        children = cache[node_label]
+        max_depth = 0
+        if len(children) == 0:
+            return 0
+
+        for child_label in children:
+            depth = get_height(child_label)
+            if max_depth < depth:
+                max_depth = depth
+
+        return 1 + max_depth
+    return get_height('-1')
 
 
 def main():
