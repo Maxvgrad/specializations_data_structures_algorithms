@@ -12,8 +12,31 @@ class Buffer:
         self.finish_time = []
 
     def process(self, request):
+
+        for i in range(0, len(self.finish_time)):
+            ft = self.finish_time[0]
+            if ft <= request.arrived_at:
+                del self.finish_time[0]
+            else:
+                break
+
+        if len(self.finish_time) == 0:
+            self.finish_time.append(request.arrived_at + request.time_to_process)
+            return Response(False, request.arrived_at)
+        elif len(self.finish_time) < self.size:
+            self.finish_time.append(self.finish_time[-1] + request.time_to_process)
+            return Response(False, self.finish_time[-2])
+
+        # if len(self.finish_time) == 0 or request.arrived_at >= self.finish_time[-1]:
+        #     self.finish_time.append(request.arrived_at + request.time_to_process)
+        #     return Response(False, request.arrived_at)
+
+        # if len(self.finish_time) - self.pointer < self.size:
+        #     self.finish_time.append(self.finish_time[-1] + request.time_to_process)
+        #     return Response(False, self.finish_time[-2])
+
         # write your code here
-        return Response(False, -1)
+        return Response(True, -1)
 
 
 def process_requests(requests, buffer):
